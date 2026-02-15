@@ -16,32 +16,44 @@
 <input id="filename" placeholder="Filename">
 
 <select id="format">
-<option value="mp3">MP3</option>
-<option value="mp4">MP4</option>
+<option value="mp3">MP3 (Audio Only)</option>
+<option value="mp4">MP4 (Video + Audio)</option>
 </select>
 
 <select id="quality">
-<option value="64">64</option>
-<option value="128">128</option>
-<option value="192">192</option>
-<option value="256">256</option>
-<option value="320">320</option>
-<option value="360">360p</option>
-<option value="480">480p</option>
-<option value="720">720p</option>
-<option value="1080">1080p</option>
+<!-- Audio quality options (shown when MP3 is selected) -->
+<option value="64" class="audio-quality">64 kbps</option>
+<option value="128" class="audio-quality">128 kbps</option>
+<option value="192" class="audio-quality">192 kbps</option>
+<option value="256" class="audio-quality">256 kbps</option>
+<option value="320" class="audio-quality">320 kbps</option>
+
+<!-- Video quality options (shown when MP4 is selected) -->
+<option value="best" class="video-quality" selected>Best Quality</option>
+<option value="2160" class="video-quality">4K (2160p)</option>
+<option value="1440" class="video-quality">2K (1440p)</option>
+<option value="1080" class="video-quality">Full HD (1080p)</option>
+<option value="720" class="video-quality">HD (720p)</option>
+<option value="480" class="video-quality">SD (480p)</option>
+<option value="360" class="video-quality">360p</option>
 </select>
 
 <button id="folderBtn">Choose Folder</button>
 <p id="folder"></p>
 
 <button id="downloadBtn">Download</button>
+<button id="cancelBtn" style="display:none;">Cancel</button>
 
 <div class="barWrap">
 <div id="bar"></div>
+<span id="percent">0%</span>
 </div>
 
-<p id="status">Idle</p>
+<div id="downloadInfo">
+  <p id="status">Idle</p>
+  <p id="eta"></p>
+  <p id="speed"></p>
+</div>
 
 <script src="renderer.js"></script>
 </body>

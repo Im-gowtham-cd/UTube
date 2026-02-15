@@ -3,6 +3,7 @@ const path = require("path");
 const ytdlp = require("yt-dlp-exec");
 
 let win;
+let currentDownload = null;
 
 function createWindow() {
   win = new BrowserWindow({
@@ -52,24 +53,42 @@ ipcMain.on("download", async (event, d) => {
     opts.audioFormat = "mp3";
     opts.audioQuality = quality;
   } else {
-    opts.format = `bestvideo[height<=${quality}]+bestaudio/best`;
+    // Fixed format selection to ensure audio is included
+    if (quality === "best") {
+      opts.format = "bestvideo+bestaudio/best";
+    } else {
+      opts.format = `bestvideo[height<=${quality}]+bestaudio/best[height<=${quality}]`;
+    }
     opts.mergeOutputFormat = "mp4";
+    opts.postprocessorArgs = ["-c:v", "copy", "-c:a", "aac"];
   }
 
   try {
-    const stream = ytdlp.exec(url, opts);
+    currentDownload = ytdlp.exec(url, opts);
 
-    stream.stdout.on("data", (chunk) => {
+    currentDownload.stdout.on("data", (chunk) => {
       const output = chunk.toString();
       
-      // Parse progress from yt-dlp output
-      const downloadMatch = output.match(/(\d{1,3}\.\d)%/);
-      if (downloadMatch) {
-        event.sender.send("progress", parseFloat(downloadMatch[1]));
+      // Parse progress, speed, and ETA from yt-dlp output
+      const progressMatch = output.match(/(\d{1,3}\.\d)%/);
+      const etaMatch = output.match(/ETA\s+(\d{2}:\d{2})/);
+      const speedMatch = output.match(/at\s+([\d.]+\w+\/s)/);
+      
+      if (progressMatch) {
+        const progress = parseFloat(progressMatch[1]);
+        const eta = etaMatch ? etaMatch[1] : "calculating...";
+        const speed = speedMatch ? speedMatch[1] : "";
+        
+        event.sender.send("progress", {
+          percent: progress,
+          eta: eta,
+          speed: speed
+        });
       }
     });
 
-    stream.on("close", (code) => {
+    currentDownload.on("close", (code) => {
+      currentDownload = null;
       if (code === 0) {
         event.sender.send("done");
       } else {
@@ -77,11 +96,20 @@ ipcMain.on("download", async (event, d) => {
       }
     });
 
-    stream.on("error", (err) => {
+    currentDownload.on("error", (err) => {
+      currentDownload = null;
       event.sender.send("error", err.message);
     });
 
   } catch (error) {
+    currentDownload = null;
     event.sender.send("error", error.message);
+  }
+});
+
+ipcMain.on("cancel-download", () => {
+  if (currentDownload) {
+    currentDownload.kill();
+    currentDownload = null;
   }
 });
