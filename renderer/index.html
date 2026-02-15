@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Downloader</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h2>YouTube Downloader</h2>
+
+<input id="url" placeholder="YouTube URL">
+
+<img id="thumb">
+
+<input id="filename" placeholder="Filename">
+
+<select id="format">
+<option value="mp3">MP3</option>
+<option value="mp4">MP4</option>
+</select>
+
+<select id="quality">
+<option value="64">64</option>
+<option value="128">128</option>
+<option value="192">192</option>
+<option value="256">256</option>
+<option value="320">320</option>
+<option value="360">360p</option>
+<option value="480">480p</option>
+<option value="720">720p</option>
+<option value="1080">1080p</option>
+</select>
+
+<button id="folderBtn">Choose Folder</button>
+<p id="folder"></p>
+
+<button id="downloadBtn">Download</button>
+
+<div class="barWrap">
+<div id="bar"></div>
+</div>
+
+<p id="status">Idle</p>
+
+<script src="renderer.js"></script>
+</body>
+</html>
