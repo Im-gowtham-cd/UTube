@@ -7,6 +7,8 @@ const downloadBtn = document.getElementById("downloadBtn");
 const cancelBtn = document.getElementById("cancelBtn");
 const formatSelect = document.getElementById("format");
 const qualitySelect = document.getElementById("quality");
+const progressCard = document.getElementById("progressCard");
+const previewSection = document.getElementById("preview-section");
 
 // Handle format change to show appropriate quality options
 formatSelect.addEventListener("change", () => {
@@ -17,18 +19,20 @@ formatSelect.addEventListener("change", () => {
   if (format === "mp3") {
     audioOptions.forEach(opt => opt.style.display = "block");
     videoOptions.forEach(opt => opt.style.display = "none");
-    qualitySelect.value = "192"; // Default audio quality
+    qualitySelect.value = "192";
   } else {
     audioOptions.forEach(opt => opt.style.display = "none");
     videoOptions.forEach(opt => opt.style.display = "block");
-    qualitySelect.value = "best"; // Default video quality
+    qualitySelect.value = "720";
   }
 });
 
 // Initialize with MP4 format
 formatSelect.dispatchEvent(new Event("change"));
 
-url.addEventListener("change", async () => {
+url.addEventListener("blur", async () => {
+  if (!url.value) return;
+  
   const i = await window.api.getInfo(url.value);
   if (!i) {
     alert("Failed to fetch video info. Please check the URL.");
@@ -36,13 +40,15 @@ url.addEventListener("change", async () => {
   }
 
   thumb.src = i.thumbnail;
-  thumb.style.display = "block";
+  previewSection.style.display = "block";
   document.getElementById("filename").value = i.title;
 });
 
 document.getElementById("folderBtn").onclick = async () => {
   folder = await window.api.chooseFolder();
-  document.getElementById("folder").innerText = folder;
+  if (folder) {
+    document.getElementById("folder").innerText = folder;
+  }
 };
 
 downloadBtn.onclick = () => {
@@ -61,8 +67,10 @@ downloadBtn.onclick = () => {
 
   isDownloading = true;
   downloadBtn.style.display = "none";
-  cancelBtn.style.display = "inline-block";
-  document.getElementById("status").innerText = "Starting download...";
+  cancelBtn.style.display = "flex";
+  progressCard.style.display = "block";
+  
+  document.getElementById("status").innerText = "Initializing...";
   document.getElementById("bar").style.width = "0%";
   document.getElementById("percent").innerText = "0%";
 };
@@ -70,38 +78,52 @@ downloadBtn.onclick = () => {
 cancelBtn.onclick = () => {
   window.api.cancelDownload();
   resetUI();
-  document.getElementById("status").innerText = "Download cancelled";
-  document.getElementById("eta").innerText = "";
-  document.getElementById("speed").innerText = "";
+  document.getElementById("status").innerText = "Cancelled";
+  document.getElementById("eta").innerText = "--";
+  document.getElementById("speed").innerText = "--";
 };
 
 window.api.onProgress(data => {
   document.getElementById("bar").style.width = data.percent + "%";
   document.getElementById("percent").innerText = data.percent.toFixed(1) + "%";
-  document.getElementById("status").innerText = "Downloading...";
-  document.getElementById("eta").innerText = "Time remaining: " + data.eta;
-  document.getElementById("speed").innerText = "Speed: " + data.speed;
+  document.getElementById("status").innerText = "Downloading";
+  document.getElementById("eta").innerText = data.eta;
+  document.getElementById("speed").innerText = data.speed;
 });
 
 window.api.onDone(() => {
-  document.getElementById("status").innerText = "Download Complete!";
-  document.getElementById("eta").innerText = "";
-  document.getElementById("speed").innerText = "";
+  document.getElementById("status").innerText = "Completed";
+  document.getElementById("eta").innerText = "Done";
+  document.getElementById("speed").innerText = "--";
   document.getElementById("bar").style.width = "100%";
   document.getElementById("percent").innerText = "100%";
-  resetUI();
+  
+  // Change status badge color to success
+  const statusBadge = document.getElementById("statusBadge");
+  statusBadge.style.background = "rgba(16, 185, 129, 0.1)";
+  statusBadge.style.borderColor = "#10b981";
+  statusBadge.style.color = "#10b981";
+  
+  setTimeout(resetUI, 3000);
 });
 
 window.api.onError(e => {
   alert("Error: " + e);
-  document.getElementById("status").innerText = "Error occurred";
-  document.getElementById("eta").innerText = "";
-  document.getElementById("speed").innerText = "";
+  document.getElementById("status").innerText = "Failed";
+  document.getElementById("eta").innerText = "--";
+  document.getElementById("speed").innerText = "--";
+  
+  // Change status badge color to error
+  const statusBadge = document.getElementById("statusBadge");
+  statusBadge.style.background = "rgba(240, 68, 56, 0.1)";
+  statusBadge.style.borderColor = "#f04438";
+  statusBadge.style.color = "#f04438";
+  
   resetUI();
 });
 
 function resetUI() {
   isDownloading = false;
-  downloadBtn.style.display = "inline-block";
+  downloadBtn.style.display = "flex";
   cancelBtn.style.display = "none";
 }

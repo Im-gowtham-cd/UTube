@@ -45,22 +45,42 @@ ipcMain.on("download", async (event, d) => {
   const opts = {
     output: `${folder}/${filename || "%(title)s.%(ext)s"}`,
     progress: true,
-    newline: true
+    newline: true,
+    
+    // Performance optimizations
+    concurrent_fragments: 5,  // Download 5 fragments at once
+    bufferSize: "16K",         // Increase buffer size
+    limitRate: null,           // No rate limit
+    noPlaylist: true,          // Skip playlist processing
+    noPart: false,             // Use .part files for resume capability
+    
+    // Network optimizations
+    retries: 10,
+    fragmentRetries: 10,
+    skipUnavailableFragments: false
   };
 
   if (format === "mp3") {
     opts.extractAudio = true;
     opts.audioFormat = "mp3";
     opts.audioQuality = quality;
+    opts.embedThumbnail = false;  // Faster without thumbnail embedding
   } else {
-    // Fixed format selection to ensure audio is included
+    // Optimized format selection
     if (quality === "best") {
-      opts.format = "bestvideo+bestaudio/best";
+      opts.format = "bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best";
     } else {
-      opts.format = `bestvideo[height<=${quality}]+bestaudio/best[height<=${quality}]`;
+      // Prefer formats that don't need re-encoding
+      opts.format = `bestvideo[height<=${quality}][ext=mp4]+bestaudio[ext=m4a]/bestvideo[height<=${quality}]+bestaudio/best`;
     }
+    
     opts.mergeOutputFormat = "mp4";
-    opts.postprocessorArgs = ["-c:v", "copy", "-c:a", "aac"];
+    
+    // Fast copy without re-encoding (much faster)
+    opts.postprocessorArgs = [
+      "-c:v", "copy",  // Copy video stream (no re-encoding)
+      "-c:a", "copy"   // Copy audio stream (no re-encoding)
+    ];
   }
 
   try {
