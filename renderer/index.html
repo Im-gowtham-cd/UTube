@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
@@ -68,14 +68,12 @@
         <div class="form-group">
           <label for="quality">Quality</label>
           <select id="quality" class="select-field">
-            <!-- Audio quality options -->
             <option value="64" class="audio-quality">64 kbps</option>
             <option value="128" class="audio-quality">128 kbps</option>
             <option value="192" class="audio-quality" selected>192 kbps</option>
             <option value="256" class="audio-quality">256 kbps</option>
             <option value="320" class="audio-quality">320 kbps</option>
 
-            <!-- Video quality options -->
             <option value="480" class="video-quality">480p (SD)</option>
             <option value="720" class="video-quality" selected>720p (HD)</option>
             <option value="1080" class="video-quality">1080p (Full HD)</option>
@@ -168,4 +166,41 @@
 
 <script src="renderer.js"></script>
 </body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UTUBE</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+  <h1 class="TopicText">UTube</h1>
+  <div class="container">
+    <div class="left">
+      <p class="left-topic">Youtube url</p>
+      <form action="" class="youtube-url-form">
+        <input type="url" placeholder="Enter URL" class="youtube-url-input">
+      </form>
+      <div class="thumbnail-container">
+        <h1 class="thumbnail-title">Thumbnail</h1>
+        <img src="" alt="" class="thumbnail-image">
+      </div>
+    </div>
+    <div class="right">
+      <div class="Filename-Container">
+        <h1 class="Filename-title">Filename</h1>
+        <form action="" class="Filename-input">
+          <input type="text" placeholder="Enter Filename" class="youtube-filename-input">
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+
 </html>

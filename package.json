@@ -7,15 +7,15 @@
     "build": "electron-builder"
   },
   "dependencies": {
-    "electron": "^28.0.0",
     "yt-dlp-exec": "latest"
   },
   "devDependencies": {
+    "electron": "^28.0.0",
     "electron-builder": "^24.0.0"
   },
   "build": {
     "appId": "com.ytdownloader.app",
-    "productName": "YT Downloader",
+    "productName": "UTube",
     "win": {
       "target": "nsis",
       "icon": "build/icon.ico"
