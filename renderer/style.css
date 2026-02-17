@@ -186,7 +186,7 @@ body {
   color: var(--text);
 }
 
-.Select-Format-container{
+.Select-Format-container {
   height: 10%;
   width: 100%;
   /* border: 1px solid var(--text); */
@@ -195,7 +195,7 @@ body {
   justify-content: space-between;
 }
 
-.Select-container{
+.Select-container {
   width: 25%;
   height: 50%;
   color: var(--bg);
@@ -205,16 +205,16 @@ body {
   font-family: 'Clash';
   font-weight: 800;
   letter-spacing: 1px;
-  font-size: clamp(15px,10vw,18px);
+  font-size: clamp(15px, 10vw, 18px);
 }
 
-.Select-container option{
+.Select-container option {
   font-weight: 800;
   letter-spacing: 1px;
-  color: var(--bg); 
+  color: var(--bg);
 }
 
-.Quality-Div{
+.Quality-Div {
   height: 100%;
   width: 50%;
   /* padding: 0 20px; */
@@ -224,7 +224,7 @@ body {
   justify-content: space-between;
 }
 
-.Quality-container{
+.Quality-container {
   width: fit-content;
   padding: 0 10px;
   height: 50%;
@@ -235,11 +235,42 @@ body {
   font-family: 'Clash';
   font-weight: 800;
   letter-spacing: 1px;
-  font-size: clamp(15px,10vw,18px);
+  font-size: clamp(15px, 10vw, 18px);
 }
 
-.Quality-container option{
+.Quality-container option {
   font-weight: 800;
   letter-spacing: 1px;
-  color: var(--bg); 
+  color: var(--bg);
+}
+
+.Download-Folder-Container {
+  height: 15%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* border: 1px solid var(--text); */
+}
+
+.Location-path-button {
+  height: 40%;
+  width: fit-content;
+  color: #c72727;
+  border: none;
+  background: var(--text);
+  font-family: 'Clash';
+  font-weight: 800;
+  padding: 0 20px;
+  font-size: clamp(16px, 10vw, 18px);
+}
+
+.File-Location {
+  font-family: 'Clash';
+  font-weight: 800;
+  padding: 0 20px;
+  text-align: end;
+  letter-spacing: 1px;
+  color: var(--text);
+  font-size: clamp(16px, 10vw, 18px);
 }
