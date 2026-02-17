@@ -169,7 +169,7 @@ body {
 
 .youtube-filename-input {
   height: 40%;
-  width: 80%;
+  width: 100%;
   border: none;
   outline: none;
   color: var(--text);
@@ -184,4 +184,62 @@ body {
 
 .youtube-filename-input::placeholder {
   color: var(--text);
+}
+
+.Select-Format-container{
+  height: 10%;
+  width: 100%;
+  /* border: 1px solid var(--text); */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.Select-container{
+  width: 25%;
+  height: 50%;
+  color: var(--bg);
+  background-color: var(--text);
+  border: none;
+  outline: none;
+  font-family: 'Clash';
+  font-weight: 800;
+  letter-spacing: 1px;
+  font-size: clamp(15px,10vw,18px);
+}
+
+.Select-container option{
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--bg); 
+}
+
+.Quality-Div{
+  height: 100%;
+  width: 50%;
+  /* padding: 0 20px; */
+  /* border: 1px solid var(--text); */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.Quality-container{
+  width: fit-content;
+  padding: 0 10px;
+  height: 50%;
+  color: var(--bg);
+  background-color: var(--text);
+  border: none;
+  outline: none;
+  font-family: 'Clash';
+  font-weight: 800;
+  letter-spacing: 1px;
+  font-size: clamp(15px,10vw,18px);
+}
+
+.Quality-container option{
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--bg); 
 }
