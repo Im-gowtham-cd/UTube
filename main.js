@@ -1,135 +1,243 @@
 const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 const path = require("path");
-const ytdlp = require("yt-dlp-exec");
+const { spawn } = require("child_process");
+const fs = require("fs");
 
 let win;
 let currentDownload = null;
 
+const isDev = !app.isPackaged;
+const YTDLP_PATH = isDev 
+  ? path.join(__dirname, "yt-dlp.exe")
+  : path.join(process.resourcesPath, "yt-dlp.exe");
+const FFMPEG_PATH = isDev
+  ? path.join(__dirname, "bin")
+  : path.join(process.resourcesPath, "bin");
+
 function createWindow() {
   win = new BrowserWindow({
-    width: 650,
-    height: 650,
+    width: 850,
+    height: 850,
+    resizable: true,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
-      nodeIntegration: false
+      nodeIntegration: false,
+      sandbox: true
     }
   });
 
-  win.loadFile("renderer/index.html");
+  win.loadFile(path.join(__dirname, "renderer", "index.html"));
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  createWindow();
+
+  app.on("activate", () => {
+    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  });
+});
+
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") app.quit();
+});
 
 ipcMain.handle("choose-folder", async () => {
-  const r = await dialog.showOpenDialog({ properties: ["openDirectory"] });
-  return r.filePaths[0];
+  const result = await dialog.showOpenDialog({
+    properties: ["openDirectory"]
+  });
+
+  if (result.canceled) return null;
+  return result.filePaths[0];
 });
 
 ipcMain.handle("get-info", async (_, url) => {
-  try {
-    const info = await ytdlp(url, {
-      dumpSingleJson: true,
-      skipDownload: true
-    });
-
-    return { title: info.title, thumbnail: info.thumbnail };
-  } catch {
+  if (!isValidYouTubeUrl(url)) {
     return null;
   }
+
+  if (!fs.existsSync(YTDLP_PATH)) {
+    throw new Error("yt-dlp.exe not found. Please ensure it's in the app directory.");
+  }
+
+  return new Promise((resolve) => {
+    const args = [
+      "--dump-single-json",
+      "--skip-download",
+      "--no-warnings",
+      "--no-playlist",
+      url
+    ];
+
+    const proc = spawn(YTDLP_PATH, args, {
+      windowsHide: true
+    });
+
+    let output = "";
+    let errorOutput = "";
+
+    proc.stdout.on("data", (data) => {
+      output += data.toString();
+    });
+
+    proc.stderr.on("data", (data) => {
+      errorOutput += data.toString();
+    });
+
+    proc.on("close", (code) => {
+      if (code === 0 && output) {
+        try {
+          const info = JSON.parse(output);
+          resolve({
+            title: info.title || "Unknown",
+            thumbnail: info.thumbnail || "",
+            duration: info.duration || 0
+          });
+        } catch {
+          resolve(null);
+        }
+      } else {
+        resolve(null);
+      }
+    });
+
+    proc.on("error", () => {
+      resolve(null);
+    });
+  });
 });
 
-ipcMain.on("download", async (event, d) => {
-  const { url, format, quality, folder, filename } = d;
+ipcMain.on("download", (event, data) => {
+  const { url, format, quality, folder, filename } = data;
 
-  const opts = {
-    output: `${folder}/${filename || "%(title)s.%(ext)s"}`,
-    progress: true,
-    newline: true,
-    
-    // Performance optimizations
-    concurrent_fragments: 5,  // Download 5 fragments at once
-    bufferSize: "16K",         // Increase buffer size
-    limitRate: null,           // No rate limit
-    noPlaylist: true,          // Skip playlist processing
-    noPart: false,             // Use .part files for resume capability
-    
-    // Network optimizations
-    retries: 10,
-    fragmentRetries: 10,
-    skipUnavailableFragments: false
-  };
+  if (!isValidYouTubeUrl(url)) {
+    event.sender.send("error", "Invalid YouTube URL");
+    return;
+  }
+
+  if (!fs.existsSync(YTDLP_PATH)) {
+    event.sender.send("error", "yt-dlp.exe not found");
+    return;
+  }
+
+  if (!fs.existsSync(FFMPEG_PATH)) {
+    event.sender.send("error", "FFmpeg not found in bin folder");
+    return;
+  }
+
+  const sanitizedFilename = sanitizeFilename(filename || "%(title)s");
+  const outputPath = path.join(folder, sanitizedFilename);
+
+  const args = [
+    "--newline",
+    "--no-warnings",
+    "--no-playlist",
+    "--concurrent-fragments", "8",
+    "--retries", "10",
+    "--fragment-retries", "10",
+    "--buffer-size", "16K",
+    "--http-chunk-size", "10M",
+    "--ffmpeg-location", FFMPEG_PATH,
+    "-o", outputPath
+  ];
 
   if (format === "mp3") {
-    opts.extractAudio = true;
-    opts.audioFormat = "mp3";
-    opts.audioQuality = quality;
-    opts.embedThumbnail = false;  // Faster without thumbnail embedding
+    args.push("-x");
+    args.push("--audio-format", "mp3");
+    args.push("--audio-quality", quality || "192");
+    args.push("--embed-thumbnail");
+    args.push("--add-metadata");
   } else {
-    // Optimized format selection
+    let formatStr;
     if (quality === "best") {
-      opts.format = "bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best";
+      formatStr = "bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best";
     } else {
-      // Prefer formats that don't need re-encoding
-      opts.format = `bestvideo[height<=${quality}][ext=mp4]+bestaudio[ext=m4a]/bestvideo[height<=${quality}]+bestaudio/best`;
+      formatStr = `bestvideo[height<=${quality}][ext=mp4]+bestaudio[ext=m4a]/bestvideo[height<=${quality}]+bestaudio/best[height<=${quality}]`;
     }
-    
-    opts.mergeOutputFormat = "mp4";
-    
-    // Fast copy without re-encoding (much faster)
-    opts.postprocessorArgs = [
-      "-c:v", "copy",  // Copy video stream (no re-encoding)
-      "-c:a", "copy"   // Copy audio stream (no re-encoding)
-    ];
+    args.push("-f", formatStr);
+    args.push("--merge-output-format", "mp4");
+    args.push("--postprocessor-args", "ffmpeg:-c:v copy -c:a copy");
   }
 
-  try {
-    currentDownload = ytdlp.exec(url, opts);
+  args.push(url);
 
-    currentDownload.stdout.on("data", (chunk) => {
-      const output = chunk.toString();
-      
-      // Parse progress, speed, and ETA from yt-dlp output
-      const progressMatch = output.match(/(\d{1,3}\.\d)%/);
-      const etaMatch = output.match(/ETA\s+(\d{2}:\d{2})/);
-      const speedMatch = output.match(/at\s+([\d.]+\w+\/s)/);
-      
-      if (progressMatch) {
-        const progress = parseFloat(progressMatch[1]);
-        const eta = etaMatch ? etaMatch[1] : "calculating...";
-        const speed = speedMatch ? speedMatch[1] : "";
-        
-        event.sender.send("progress", {
-          percent: progress,
-          eta: eta,
-          speed: speed
-        });
-      }
-    });
+  currentDownload = spawn(YTDLP_PATH, args, {
+    windowsHide: true
+  });
 
-    currentDownload.on("close", (code) => {
-      currentDownload = null;
-      if (code === 0) {
-        event.sender.send("done");
-      } else {
-        event.sender.send("error", "Download failed");
-      }
-    });
+  currentDownload.stdout.on("data", (chunk) => {
+    const output = chunk.toString();
+    
+    const progressMatch = output.match(/(\d{1,3}\.\d)%/);
+    const etaMatch = output.match(/ETA\s+(\d{2}:\d{2})/);
+    const speedMatch = output.match(/([\d.]+\s*[KMG]iB\/s)/i);
 
-    currentDownload.on("error", (err) => {
-      currentDownload = null;
-      event.sender.send("error", err.message);
-    });
+    if (progressMatch) {
+      event.sender.send("progress", {
+        percent: parseFloat(progressMatch[1]),
+        eta: etaMatch ? etaMatch[1] : "",
+        speed: speedMatch ? speedMatch[1] : ""
+      });
+    }
+  });
 
-  } catch (error) {
+  currentDownload.stderr.on("data", (chunk) => {
+    const output = chunk.toString();
+    
+    const progressMatch = output.match(/(\d{1,3}\.\d)%/);
+    const etaMatch = output.match(/ETA\s+(\d{2}:\d{2})/);
+    const speedMatch = output.match(/([\d.]+\s*[KMG]iB\/s)/i);
+
+    if (progressMatch) {
+      event.sender.send("progress", {
+        percent: parseFloat(progressMatch[1]),
+        eta: etaMatch ? etaMatch[1] : "",
+        speed: speedMatch ? speedMatch[1] : ""
+      });
+    }
+  });
+
+  currentDownload.on("close", (code) => {
     currentDownload = null;
-    event.sender.send("error", error.message);
-  }
+    if (code === 0) {
+      event.sender.send("done");
+    } else {
+      event.sender.send("error", "Download failed or was cancelled");
+    }
+  });
+
+  currentDownload.on("error", (err) => {
+    currentDownload = null;
+    event.sender.send("error", err.message);
+  });
 });
 
 ipcMain.on("cancel-download", () => {
-  if (currentDownload) {
-    currentDownload.kill();
+  if (currentDownload && !currentDownload.killed) {
+    try {
+      if (process.platform === "win32") {
+        spawn("taskkill", ["/pid", currentDownload.pid, "/f", "/t"], {
+          windowsHide: true
+        });
+      } else {
+        currentDownload.kill("SIGKILL");
+      }
+    } catch (err) {
+      console.error("Failed to kill process:", err);
+    }
     currentDownload = null;
   }
 });
+
+function isValidYouTubeUrl(url) {
+  const patterns = [
+    /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/,
+    /^(https?:\/\/)?(www\.)?youtube\.com\/watch\?v=[\w-]+/,
+    /^(https?:\/\/)?(www\.)?youtu\.be\/[\w-]+/
+  ];
+  return patterns.some(pattern => pattern.test(url));
+}
+
+function sanitizeFilename(filename) {
+  return filename.replace(/[<>:"/\\|?*\x00-\x1F]/g, "_");
+}

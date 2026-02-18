@@ -6,19 +6,46 @@
     "start": "electron .",
     "build": "electron-builder"
   },
-  "dependencies": {
-    "yt-dlp-exec": "latest"
-  },
   "devDependencies": {
-    "electron": "^28.0.0",
-    "electron-builder": "^24.0.0"
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
   },
   "build": {
     "appId": "com.ytdownloader.app",
     "productName": "UTube",
+    "files": [
+      "**/*",
+      "yt-dlp.exe",
+      "bin/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "yt-dlp.exe",
+        "to": "yt-dlp.exe"
+      },
+      {
+        "from": "bin",
+        "to": "bin"
+      }
+    ],
     "win": {
-      "target": "nsis",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ],
       "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
     }
   }
 }

@@ -49,7 +49,8 @@ body {
 
 
 .container {
-  height: 80vh;
+  margin-top: 10vh;
+  height: 70vh;
   width: 90%;
   display: flex;
 }
@@ -79,7 +80,7 @@ body {
 }
 
 .youtube-url-form {
-  height: 15%;
+  height: 20%;
   display: flex;
   align-items: center;
   width: 100%;
@@ -105,7 +106,7 @@ body {
 }
 
 .thumbnail-container {
-  height: 80%;
+  height: 90%;
   display: flex;
   flex-direction: column;
   width: 80%;
@@ -113,14 +114,14 @@ body {
 
 .thumbnail-title {
   font-family: 'Fuji', serif;
-  margin-top: 5vh;
+  margin-top: 4vh;
   color: var(--text);
   letter-spacing: 2px;
   font-size: clamp(20px, 10vw, 40px);
 }
 
 .thumbnail-placeholder {
-  height: 55%;
+  height: 65%;
   margin-top: 3vh;
   width: 100%;
   border: 3px solid var(--text);
@@ -140,7 +141,8 @@ body {
   height: 55%;
   margin-top: 3vh;
   width: 100%;
-  border: 3px solid var(--text);
+  /* border: 1px solid var(--text); */
+  box-shadow: 0px 1px 5px var(--text);
   object-fit: cover;
   display: none;
 }
@@ -154,7 +156,7 @@ body {
 }
 
 .Filename-Container {
-  height: 20%;
+  height: 26%;
   display: flex;
   flex-direction: column;
   width: 100%;
