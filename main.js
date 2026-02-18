@@ -1,10 +1,11 @@
 const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 const path = require("path");
-const { spawn } = require("child_process");
+const { spawn, exec } = require("child_process");
 const fs = require("fs");
 
 let win;
 let currentDownload = null;
+let downloadCancelled = false;
 
 const isDev = !app.isPackaged;
 const YTDLP_PATH = isDev 
@@ -110,6 +111,8 @@ ipcMain.handle("get-info", async (_, url) => {
 ipcMain.on("download", (event, data) => {
   const { url, format, quality, folder, filename } = data;
 
+  downloadCancelled = false;
+
   if (!isValidYouTubeUrl(url)) {
     event.sender.send("error", "Invalid YouTube URL");
     return;
@@ -132,9 +135,10 @@ ipcMain.on("download", (event, data) => {
     "--newline",
     "--no-warnings",
     "--no-playlist",
+    "--no-continue",
     "--concurrent-fragments", "8",
-    "--retries", "10",
-    "--fragment-retries", "10",
+    "--retries", "3",
+    "--fragment-retries", "3",
     "--buffer-size", "16K",
     "--http-chunk-size", "10M",
     "--ffmpeg-location", FFMPEG_PATH,
@@ -162,10 +166,13 @@ ipcMain.on("download", (event, data) => {
   args.push(url);
 
   currentDownload = spawn(YTDLP_PATH, args, {
-    windowsHide: true
+    windowsHide: true,
+    detached: false
   });
 
   currentDownload.stdout.on("data", (chunk) => {
+    if (downloadCancelled) return;
+    
     const output = chunk.toString();
     
     const progressMatch = output.match(/(\d{1,3}\.\d)%/);
@@ -182,6 +189,8 @@ ipcMain.on("download", (event, data) => {
   });
 
   currentDownload.stderr.on("data", (chunk) => {
+    if (downloadCancelled) return;
+    
     const output = chunk.toString();
     
     const progressMatch = output.match(/(\d{1,3}\.\d)%/);
@@ -198,34 +207,66 @@ ipcMain.on("download", (event, data) => {
   });
 
   currentDownload.on("close", (code) => {
+    const wasCancelled = downloadCancelled;
     currentDownload = null;
+    downloadCancelled = false;
+    
+    if (wasCancelled) {
+      return;
+    }
+    
     if (code === 0) {
       event.sender.send("done");
     } else {
-      event.sender.send("error", "Download failed or was cancelled");
+      event.sender.send("error", "Download failed");
     }
   });
 
   currentDownload.on("error", (err) => {
     currentDownload = null;
+    downloadCancelled = false;
     event.sender.send("error", err.message);
   });
 });
 
-ipcMain.on("cancel-download", () => {
+ipcMain.on("cancel-download", (event) => {
   if (currentDownload && !currentDownload.killed) {
+    downloadCancelled = true;
+    
+    const pid = currentDownload.pid;
+    
     try {
       if (process.platform === "win32") {
-        spawn("taskkill", ["/pid", currentDownload.pid, "/f", "/t"], {
-          windowsHide: true
+        exec(`taskkill /F /T /PID ${pid}`, (error) => {
+          if (error) {
+            console.error("Taskkill main error:", error);
+          }
         });
+        
+        exec(`taskkill /F /IM yt-dlp.exe`, (error) => {
+          if (error) {
+            console.error("Taskkill yt-dlp error:", error);
+          }
+        });
+        
+        exec(`taskkill /F /IM ffmpeg.exe`, (error) => {
+          if (error) {
+            console.error("Taskkill ffmpeg error:", error);
+          }
+        });
+        
+        setTimeout(() => {
+          exec(`wmic process where "name='yt-dlp.exe' or name='ffmpeg.exe'" delete`, () => {});
+        }, 500);
       } else {
         currentDownload.kill("SIGKILL");
       }
+      
+      currentDownload = null;
     } catch (err) {
       console.error("Failed to kill process:", err);
+      currentDownload = null;
     }
-    currentDownload = null;
   }
 });
 

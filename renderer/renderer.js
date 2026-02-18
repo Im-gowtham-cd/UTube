@@ -112,10 +112,15 @@ downloadBtn.addEventListener("click", () => {
 
 cancelBtn.addEventListener("click", () => {
   window.api.cancelDownload();
-  resetUI();
-  setStatus("Cancelled", "idle");
+  bar.style.width = "0%";
+  percent.textContent = "0%";
   eta.textContent = "--";
   speed.textContent = "--";
+  setStatus("Cancelled", "error");
+  setTimeout(() => {
+    resetUI();
+    progressCard.classList.remove("visible");
+  }, 1500);
 });
 
 window.api.onProgress(data => {
