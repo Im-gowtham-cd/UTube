@@ -13,7 +13,6 @@
   src: url('../font/Fuij.otf');
 }
 
-
 * {
   margin: 0;
   padding: 0;
@@ -25,7 +24,6 @@
   --text: #ffffff;
 }
 
-
 body {
   height: 100vh;
   width: 100vw;
@@ -33,48 +31,48 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow: hidden;
 }
+
 
 .TopicText {
   height: 15vh;
   width: 90%;
-  /* border: 1px solid; */
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Fuji';
+  font-family: 'Fuji', serif;
   font-size: clamp(20px, 10vw, 80px);
   letter-spacing: 3px;
   color: var(--text);
 }
 
+
 .container {
   height: 80vh;
   width: 90%;
   display: flex;
-  /* border: 5px solid var(--text); */
 }
 
+
 .left {
-  /* border: 1px solid var(--text); */
   height: 100%;
   width: 50%;
   position: relative;
+}
 
-  &::after {
-    position: absolute;
-    content: '';
-    height: 100%;
-    width: 5px;
-    background-color: var(--text);
-    right: 0;
-    top: 0;
-    /* border-radius: 10px; */
-  }
+.left::after {
+  position: absolute;
+  content: '';
+  height: 100%;
+  width: 5px;
+  background-color: var(--text);
+  right: 0;
+  top: 0;
 }
 
 .left-topic {
-  font-family: 'Fuji';
+  font-family: 'Fuji', serif;
   color: var(--text);
   letter-spacing: 2px;
   font-size: clamp(20px, 10vw, 40px);
@@ -85,18 +83,16 @@ body {
   display: flex;
   align-items: center;
   width: 100%;
-  /* border: 1px solid var(--text); */
 }
 
 .youtube-url-input {
-  /* border: 1px solid var(--text); */
   height: 40%;
   width: 80%;
   border: none;
   outline: none;
   color: var(--text);
   font-weight: 800;
-  font-family: 'Clash';
+  font-family: 'Clash', sans-serif;
   font-size: 20px;
   padding-left: 5px;
   letter-spacing: 1.5px;
@@ -105,38 +101,53 @@ body {
 }
 
 .youtube-url-input::placeholder {
-  color: var(--text);
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .thumbnail-container {
   height: 80%;
   display: flex;
   flex-direction: column;
-  /* justify-content: center; */
   width: 80%;
-  /* gap: 20px; */
-  /* border: 1px solid var(--text); */
 }
 
 .thumbnail-title {
-  font-family: 'Fuji';
+  font-family: 'Fuji', serif;
   margin-top: 5vh;
   color: var(--text);
   letter-spacing: 2px;
   font-size: clamp(20px, 10vw, 40px);
 }
 
-.thumbnail-image {
-  height: 100%;
-  margin-top: 5vh;
+.thumbnail-placeholder {
+  height: 55%;
+  margin-top: 3vh;
   width: 100%;
-  border: 1px solid var(--text);
+  border: 3px solid var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.4;
+}
+
+.thumbnail-placeholder svg {
+  width: 60px;
+  height: 60px;
+  stroke: var(--text);
+}
+
+.thumbnail-image {
+  height: 55%;
+  margin-top: 3vh;
+  width: 100%;
+  border: 3px solid var(--text);
+  object-fit: cover;
+  display: none;
 }
 
 .right {
   width: 50%;
   height: 100%;
-  /* border: 1px solid var(--text); */
   padding-left: 5%;
   display: flex;
   flex-direction: column;
@@ -145,15 +156,12 @@ body {
 .Filename-Container {
   height: 20%;
   display: flex;
-  /* align-items: center; */
   flex-direction: column;
-  /* border: 1px solid var(--text); */
   width: 100%;
 }
 
 .Filename-title {
-  font-family: 'Fuji';
-  /* margin-top: 5vh; */
+  font-family: 'Fuji', serif;
   color: var(--text);
   letter-spacing: 2px;
   font-size: clamp(20px, 10vw, 40px);
@@ -164,7 +172,6 @@ body {
   width: 100%;
   display: flex;
   align-items: center;
-  /* border: 1px solid var(--text); */
 }
 
 .youtube-filename-input {
@@ -174,7 +181,7 @@ body {
   outline: none;
   color: var(--text);
   font-weight: 800;
-  font-family: 'Clash';
+  font-family: 'Clash', sans-serif;
   font-size: 20px;
   padding-left: 5px;
   letter-spacing: 1.5px;
@@ -183,29 +190,30 @@ body {
 }
 
 .youtube-filename-input::placeholder {
-  color: var(--text);
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .Select-Format-container {
   height: 10%;
   width: 100%;
-  /* border: 1px solid var(--text); */
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
 .Select-container {
-  width: 25%;
+  width: 28%;
   height: 50%;
   color: var(--bg);
   background-color: var(--text);
   border: none;
   outline: none;
-  font-family: 'Clash';
+  font-family: 'Clash', sans-serif;
   font-weight: 800;
   letter-spacing: 1px;
-  font-size: clamp(15px, 10vw, 18px);
+  font-size: clamp(13px, 10vw, 17px);
+  cursor: pointer;
+  padding: 0 6px;
 }
 
 .Select-container option {
@@ -216,26 +224,25 @@ body {
 
 .Quality-Div {
   height: 100%;
-  width: 50%;
-  /* padding: 0 20px; */
-  /* border: 1px solid var(--text); */
+  width: 68%;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 8px;
 }
 
 .Quality-container {
-  width: fit-content;
-  padding: 0 10px;
+  flex: 1;
+  padding: 0 6px;
   height: 50%;
   color: var(--bg);
   background-color: var(--text);
   border: none;
   outline: none;
-  font-family: 'Clash';
+  font-family: 'Clash', sans-serif;
   font-weight: 800;
   letter-spacing: 1px;
-  font-size: clamp(15px, 10vw, 18px);
+  font-size: clamp(11px, 10vw, 15px);
+  cursor: pointer;
 }
 
 .Quality-container option {
@@ -245,32 +252,194 @@ body {
 }
 
 .Download-Folder-Container {
-  height: 15%;
+  height: 12%;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  /* border: 1px solid var(--text); */
 }
 
 .Location-path-button {
-  height: 40%;
+  height: 38%;
   width: fit-content;
-  color: #c72727;
+  color: var(--bg);
   border: none;
   background: var(--text);
-  font-family: 'Clash';
+  font-family: 'Clash', sans-serif;
   font-weight: 800;
   padding: 0 20px;
-  font-size: clamp(16px, 10vw, 18px);
+  font-size: clamp(14px, 10vw, 16px);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+
+.Location-path-button:hover {
+  opacity: 0.85;
 }
 
 .File-Location {
-  font-family: 'Clash';
+  font-family: 'Clash', sans-serif;
   font-weight: 800;
-  padding: 0 20px;
+  padding: 0 0 0 12px;
   text-align: end;
   letter-spacing: 1px;
   color: var(--text);
-  font-size: clamp(16px, 10vw, 18px);
+  font-size: clamp(12px, 10vw, 14px);
+  opacity: 0.75;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 55%;
+}
+
+.Download-Button-Container {
+  height: 12%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.Download-Button-Container button {
+  height: 50%;
+  border: none;
+  background: var(--text);
+  font-family: 'Clash', sans-serif;
+  color: var(--bg);
+  font-weight: 800;
+  font-size: clamp(14px, 10vw, 18px);
+  flex: 1;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: opacity 0.15s, transform 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.Download-Button-Container button:hover {
+  opacity: 0.9;
+  transform: scaleY(1.03);
+}
+
+.Download-Button-Container button:active {
+  transform: scaleY(0.97);
+}
+
+#cancelBtn {
+  display: none !important;
+  background: transparent;
+  color: var(--text);
+  border: 2px solid var(--text);
+}
+
+#cancelBtn.visible {
+  display: flex !important;
+}
+
+.progress-card {
+  margin-top: 12px;
+  width: 100%;
+  border: 2px solid var(--text);
+  padding: 14px 16px;
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.progress-card.visible {
+  display: flex;
+}
+
+.progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.progress-header h3 {
+  font-family: 'Fuji', serif;
+  color: var(--text);
+  letter-spacing: 2px;
+  font-size: clamp(16px, 10vw, 22px);
+}
+
+.progress-percent {
+  font-family: 'Clash', sans-serif;
+  font-weight: 800;
+  color: var(--text);
+  font-size: clamp(18px, 10vw, 26px);
+  letter-spacing: 1px;
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.25);
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--text);
+  transition: width 0.3s ease;
+}
+
+.progress-info {
+  display: flex;
+  gap: 20px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Clash', sans-serif;
+  font-weight: 800;
+  color: var(--text);
+  font-size: clamp(12px, 10vw, 14px);
+  letter-spacing: 1px;
+  opacity: 0.85;
+}
+
+.info-icon {
+  width: 16px;
+  height: 16px;
+  stroke: var(--text);
+  flex-shrink: 0;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  width: fit-content;
+  background: rgba(255, 255, 255, 0.08);
+  transition: all 0.3s;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+#status {
+  font-family: 'Clash', sans-serif;
+  font-weight: 800;
+  color: var(--text);
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
 }

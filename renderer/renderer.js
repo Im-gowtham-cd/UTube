@@ -1,129 +1,182 @@
-let folder = "";
-let isDownloading = false;
+/* ── Element refs ── */
+const urlInput         = document.getElementById("url");
+const thumb            = document.getElementById("thumb");
+const thumbPlaceholder = document.getElementById("thumbPlaceholder");
+const filenameInput    = document.getElementById("filename");
+const formatSelect     = document.getElementById("format");
+const qualitySelect    = document.getElementById("quality");
+const folderBtn        = document.getElementById("folderBtn");
+const folderText       = document.getElementById("folder");
+const downloadBtn      = document.getElementById("downloadBtn");
+const cancelBtn        = document.getElementById("cancelBtn");
+const progressCard     = document.getElementById("progressCard");
+const bar              = document.getElementById("bar");
+const percent          = document.getElementById("percent");
+const eta              = document.getElementById("eta");
+const speed            = document.getElementById("speed");
+const status           = document.getElementById("status");
+const statusBadge      = document.getElementById("statusBadge");
 
-const url = document.getElementById("url");
-const thumb = document.getElementById("thumb");
-const downloadBtn = document.getElementById("downloadBtn");
-const cancelBtn = document.getElementById("cancelBtn");
-const formatSelect = document.getElementById("format");
-const qualitySelect = document.getElementById("quality");
-const progressCard = document.getElementById("progressCard");
-const previewSection = document.getElementById("preview-section");
+/* ── State ── */
+let selectedFolder = "";
+let isDownloading  = false;
 
-// Handle format change to show appropriate quality options
-formatSelect.addEventListener("change", () => {
-  const format = formatSelect.value;
-  const audioOptions = document.querySelectorAll(".audio-quality");
-  const videoOptions = document.querySelectorAll(".video-quality");
-  
-  if (format === "mp3") {
-    audioOptions.forEach(opt => opt.style.display = "block");
-    videoOptions.forEach(opt => opt.style.display = "none");
-    qualitySelect.value = "192";
-  } else {
-    audioOptions.forEach(opt => opt.style.display = "none");
-    videoOptions.forEach(opt => opt.style.display = "block");
-    qualitySelect.value = "720";
-  }
-});
-
-// Initialize with MP4 format
-formatSelect.dispatchEvent(new Event("change"));
-
-url.addEventListener("blur", async () => {
-  if (!url.value) return;
-  
-  const i = await window.api.getInfo(url.value);
-  if (!i) {
-    alert("Failed to fetch video info. Please check the URL.");
-    return;
-  }
-
-  thumb.src = i.thumbnail;
-  previewSection.style.display = "block";
-  document.getElementById("filename").value = i.title;
-});
-
-document.getElementById("folderBtn").onclick = async () => {
-  folder = await window.api.chooseFolder();
-  if (folder) {
-    document.getElementById("folder").innerText = folder;
-  }
+/* ── Quality options per format ── */
+const qualities = {
+  mp4: [
+    { value: "480",  label: "480p (SD)" },
+    { value: "720",  label: "720p (HD)" },
+    { value: "1080", label: "1080p (Full HD)" },
+    { value: "1440", label: "1440p (2K)" },
+    { value: "2160", label: "2160p (4K)" },
+    { value: "best", label: "Best Available" },
+  ],
+  mp3: [
+    { value: "64",  label: "64 kbps" },
+    { value: "128", label: "128 kbps" },
+    { value: "192", label: "192 kbps" },
+    { value: "256", label: "256 kbps" },
+    { value: "320", label: "320 kbps" },
+  ]
 };
 
-downloadBtn.onclick = () => {
-  if (!url.value || !folder) {
-    alert("Please enter a URL and choose a folder");
-    return;
+function populateQualities(format) {
+  qualitySelect.innerHTML = "";
+  qualities[format].forEach(q => {
+    const opt = document.createElement("option");
+    opt.value = q.value;
+    opt.textContent = q.label;
+    qualitySelect.appendChild(opt);
+  });
+  qualitySelect.value = format === "mp3" ? "192" : "720";
+}
+
+/* ── Format change ── */
+formatSelect.addEventListener("change", () => populateQualities(formatSelect.value));
+populateQualities("mp4");
+
+/* ── URL blur → fetch video info ── */
+urlInput.addEventListener("blur", async () => {
+  const val = urlInput.value.trim();
+  if (!val) return;
+  try {
+    const info = await window.api.getInfo(val);
+    if (!info) { alert("Failed to fetch video info. Please check the URL."); return; }
+    thumb.src = info.thumbnail;
+    thumb.style.display = "block";
+    thumbPlaceholder.style.display = "none";
+    filenameInput.value = info.title;
+  } catch (e) {
+    alert("Error fetching info: " + e);
   }
+});
+
+/* ── Folder picker ── */
+folderBtn.addEventListener("click", async () => {
+  try {
+    const f = await window.api.chooseFolder();
+    if (f) { selectedFolder = f; folderText.textContent = f; }
+  } catch (e) { console.error("Folder picker error:", e); }
+});
+
+/* ── Download ── */
+downloadBtn.addEventListener("click", () => {
+  const url = urlInput.value.trim();
+  if (!url) { alert("Please enter a YouTube URL."); return; }
+  if (!selectedFolder) { alert("Please choose a download folder."); return; }
 
   window.api.download({
-    url: url.value,
-    filename: document.getElementById("filename").value,
-    format: document.getElementById("format").value,
-    quality: document.getElementById("quality").value,
-    folder
+    url,
+    filename: filenameInput.value.trim(),
+    format:   formatSelect.value,
+    quality:  qualitySelect.value,
+    folder:   selectedFolder
   });
 
-  isDownloading = true;
-  downloadBtn.style.display = "none";
-  cancelBtn.style.display = "flex";
-  progressCard.style.display = "block";
-  
-  document.getElementById("status").innerText = "Initializing...";
-  document.getElementById("bar").style.width = "0%";
-  document.getElementById("percent").innerText = "0%";
-};
+  startDownloadUI();
+});
 
-cancelBtn.onclick = () => {
+/* ── Cancel ── */
+cancelBtn.addEventListener("click", () => {
   window.api.cancelDownload();
   resetUI();
-  document.getElementById("status").innerText = "Cancelled";
-  document.getElementById("eta").innerText = "--";
-  document.getElementById("speed").innerText = "--";
-};
+  setStatus("Cancelled", "idle");
+  eta.textContent   = "--";
+  speed.textContent = "--";
+});
 
+/* ── Progress events ── */
 window.api.onProgress(data => {
-  document.getElementById("bar").style.width = data.percent + "%";
-  document.getElementById("percent").innerText = data.percent.toFixed(1) + "%";
-  document.getElementById("status").innerText = "Downloading";
-  document.getElementById("eta").innerText = data.eta;
-  document.getElementById("speed").innerText = data.speed;
+  bar.style.width     = data.percent + "%";
+  percent.textContent = data.percent.toFixed(1) + "%";
+  eta.textContent     = data.eta   || "--";
+  speed.textContent   = data.speed || "--";
+  setStatus("Downloading", "idle");
 });
 
 window.api.onDone(() => {
-  document.getElementById("status").innerText = "Completed";
-  document.getElementById("eta").innerText = "Done";
-  document.getElementById("speed").innerText = "--";
-  document.getElementById("bar").style.width = "100%";
-  document.getElementById("percent").innerText = "100%";
-  
-  // Change status badge color to success
-  const statusBadge = document.getElementById("statusBadge");
-  statusBadge.style.background = "rgba(16, 185, 129, 0.1)";
-  statusBadge.style.borderColor = "#10b981";
-  statusBadge.style.color = "#10b981";
-  
+  bar.style.width     = "100%";
+  percent.textContent = "100%";
+  eta.textContent     = "Done";
+  speed.textContent   = "--";
+  setStatus("Completed", "success");
   setTimeout(resetUI, 3000);
 });
 
-window.api.onError(e => {
-  alert("Error: " + e);
-  document.getElementById("status").innerText = "Failed";
-  document.getElementById("eta").innerText = "--";
-  document.getElementById("speed").innerText = "--";
-  
-  // Change status badge color to error
-  const statusBadge = document.getElementById("statusBadge");
-  statusBadge.style.background = "rgba(240, 68, 56, 0.1)";
-  statusBadge.style.borderColor = "#f04438";
-  statusBadge.style.color = "#f04438";
-  
-  resetUI();
+window.api.onError(errMsg => {
+  let msg = errMsg || "Unknown error";
+  if (msg.includes("yt-dlp") || msg.includes("spawn")) {
+    msg = "yt-dlp not found.\n\nInstall it:\n  Windows: winget install yt-dlp\n  or: https://github.com/yt-dlp/yt-dlp/releases";
+  } else if (msg.includes("ffmpeg")) {
+    msg = "ffmpeg not found.\n\nInstall it:\n  Windows: winget install ffmpeg\n  or: https://ffmpeg.org/download.html";
+  } else if (msg.includes("unavailable") || msg.includes("private")) {
+    msg = "Video is unavailable or private.";
+  } else if (msg.includes("403") || msg.includes("sign in")) {
+    msg = "This video requires sign-in.\n\nTry updating yt-dlp:\n  yt-dlp -U";
+  }
+  alert("Download Error:\n\n" + msg);
+  setStatus("Failed", "error");
+  eta.textContent   = "--";
+  speed.textContent = "--";
+  setTimeout(resetUI, 2000);
 });
+
+/* ── UI helpers ── */
+function startDownloadUI() {
+  isDownloading = true;
+  downloadBtn.style.display = "none";
+  cancelBtn.classList.add("visible");
+  progressCard.classList.add("visible");
+  bar.style.width     = "0%";
+  percent.textContent = "0%";
+  eta.textContent     = "Calculating...";
+  speed.textContent   = "--";
+  setStatus("Initializing", "idle");
+}
 
 function resetUI() {
   isDownloading = false;
   downloadBtn.style.display = "flex";
-  cancelBtn.style.display = "none";
+  cancelBtn.classList.remove("visible");
+}
+
+function setStatus(label, state) {
+  status.textContent = label;
+  const dot = statusBadge.querySelector(".status-dot");
+  statusBadge.style.border     = "1.5px solid rgba(255,255,255,0.5)";
+  statusBadge.style.background = "rgba(255,255,255,0.08)";
+  dot.style.background         = "var(--text)";
+  dot.style.animation          = "pulse 1.4s ease-in-out infinite";
+  status.style.color           = "var(--text)";
+  if (state === "success") {
+    statusBadge.style.border     = "1.5px solid #10b981";
+    statusBadge.style.background = "rgba(16,185,129,0.12)";
+    dot.style.background         = "#10b981";
+    dot.style.animation          = "none";
+  } else if (state === "error") {
+    statusBadge.style.border     = "1.5px solid #f04438";
+    statusBadge.style.background = "rgba(240,68,56,0.12)";
+    dot.style.background         = "#f04438";
+    dot.style.animation          = "none";
+  }
 }

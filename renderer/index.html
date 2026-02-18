@@ -1,174 +1,3 @@
-<!-- <!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>YouTube Downloader</title>
-<link rel="stylesheet" href="style.css">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-</head>
-<body>
-
-<div class="container">
-  <header>
-    <div class="logo-section">
-      <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      <h1>YouTube Downloader</h1>
-    </div>
-    <p class="subtitle">Download videos and audio in high quality</p>
-  </header>
-
-  <div class="main-content">
-    <div class="card">
-      <div class="form-group">
-        <label for="url">Video URL</label>
-        <input 
-          id="url" 
-          type="text"
-          placeholder="https://www.youtube.com/watch?v=..."
-          class="input-field"
-        >
-      </div>
-
-      <div id="preview-section" style="display: none;">
-        <div class="preview-card">
-          <img id="thumb" alt="Video thumbnail">
-          <div class="preview-overlay">
-            <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M8 5v14l11-7z"/>
-            </svg>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="filename">Filename (Optional)</label>
-        <input 
-          id="filename" 
-          type="text"
-          placeholder="Leave empty to use video title"
-          class="input-field"
-        >
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label for="format">Format</label>
-          <select id="format" class="select-field">
-            <option value="mp4">MP4 (Video + Audio)</option>
-            <option value="mp3">MP3 (Audio Only)</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="quality">Quality</label>
-          <select id="quality" class="select-field">
-            <option value="64" class="audio-quality">64 kbps</option>
-            <option value="128" class="audio-quality">128 kbps</option>
-            <option value="192" class="audio-quality" selected>192 kbps</option>
-            <option value="256" class="audio-quality">256 kbps</option>
-            <option value="320" class="audio-quality">320 kbps</option>
-
-            <option value="480" class="video-quality">480p (SD)</option>
-            <option value="720" class="video-quality" selected>720p (HD)</option>
-            <option value="1080" class="video-quality">1080p (Full HD)</option>
-            <option value="1440" class="video-quality">1440p (2K)</option>
-            <option value="2160" class="video-quality">2160p (4K)</option>
-            <option value="best" class="video-quality">Best Available</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label>Download Location</label>
-        <button id="folderBtn" class="btn-secondary">
-          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          Choose Folder
-        </button>
-        <p id="folder" class="folder-path"></p>
-      </div>
-
-      <div class="button-group">
-        <button id="downloadBtn" class="btn-primary">
-          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          Download
-        </button>
-        <button id="cancelBtn" class="btn-danger" style="display:none;">
-          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <circle cx="12" cy="12" r="10" stroke-width="2"/>
-            <line x1="15" y1="9" x2="9" y2="15" stroke-width="2" stroke-linecap="round"/>
-            <line x1="9" y1="9" x2="15" y2="15" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-          Cancel
-        </button>
-      </div>
-    </div>
-
-    <div class="progress-card" id="progressCard" style="display: none;">
-      <div class="progress-header">
-        <h3>Download Progress</h3>
-        <span id="percent" class="progress-percent">0%</span>
-      </div>
-      
-      <div class="progress-bar-container">
-        <div id="bar" class="progress-bar"></div>
-      </div>
-
-      <div class="progress-info">
-        <div class="info-item">
-          <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <circle cx="12" cy="12" r="10" stroke-width="2"/>
-            <polyline points="12 6 12 12 16 14" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-          <span id="eta">Calculating...</span>
-        </div>
-        <div class="info-item">
-          <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span id="speed">--</span>
-        </div>
-      </div>
-
-      <div class="status-badge" id="statusBadge">
-        <div class="status-dot"></div>
-        <span id="status">Idle</span>
-      </div>
-    </div>
-
-    <div class="info-card">
-      <div class="info-header">
-        <svg class="info-header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <circle cx="12" cy="12" r="10" stroke-width="2"/>
-          <line x1="12" y1="16" x2="12" y2="12" stroke-width="2" stroke-linecap="round"/>
-          <line x1="12" y1="8" x2="12.01" y2="8" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-        <h3>Quick Tips</h3>
-      </div>
-      <ul class="tips-list">
-        <li>720p offers the best balance between quality and speed</li>
-        <li>MP3 format is fastest for audio-only content</li>
-        <li>Higher quality means larger files and longer downloads</li>
-        <li>Download speed depends on your internet connection</li>
-      </ul>
-    </div>
-  </div>
-</div>
-
-<script src="renderer.js"></script>
-</body>
-</html> -->
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -180,59 +9,93 @@
 </head>
 
 <body>
+
   <h1 class="TopicText">UTube</h1>
+
   <div class="container">
+
     <div class="left">
       <p class="left-topic">Youtube url</p>
-      <form action="" class="youtube-url-form">
-        <input type="url" placeholder="Enter URL" class="youtube-url-input">
+      <form class="youtube-url-form" onsubmit="return false;">
+        <input id="url" type="url" placeholder="Enter URL" class="youtube-url-input">
       </form>
       <div class="thumbnail-container">
         <h1 class="thumbnail-title">Thumbnail</h1>
-        <img src="" alt="" class="thumbnail-image">
+        <div class="thumbnail-placeholder" id="thumbPlaceholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="3" />
+            <polygon points="10,8 16,12 10,16" />
+          </svg>
+        </div>
+        <img id="thumb" src="" alt="Thumbnail" class="thumbnail-image">
       </div>
     </div>
+
+
     <div class="right">
+
       <div class="Filename-Container">
         <h1 class="Filename-title">Filename</h1>
-        <form action="" class="Filename-input">
-          <input type="text" placeholder="Enter Filename" class="youtube-filename-input">
+        <form class="Filename-input" onsubmit="return false;">
+          <input id="filename" type="text" placeholder="Enter Filename" class="youtube-filename-input">
         </form>
       </div>
-      <!--Select Path-->
+
       <div class="Select-Format-container">
-        <select name="" id="" class="Select-container">
-          <option value="">Select a type</option>
-          <option value="">MP4</option>
-          <option value="">MP3</option>
+        <select id="format" class="Select-container">
+          <option value="mp4">MP4</option>
+          <option value="mp3">MP3</option>
         </select>
         <div class="Quality-Div">
-          <select name="" id="" class="Quality-container">
-            <option value="">Audio Quality</option>
-            <option value="64" class="audio-quality">64 kbps</option>
-            <option value="128" class="audio-quality">128 kbps</option>
-            <option value="192" class="audio-quality">192 kbps</option>
-            <option value="256" class="audio-quality">256 kbps</option>
-            <option value="320" class="audio-quality">320 kbps</option>
-          </select>
-          <select name="" id="" class="Quality-container">
-            <option value="">Video Quality</option>
-            <option value="480" class="video-quality">480p (SD)</option>
-            <option value="720" class="video-quality">720p (HD)</option>
-            <option value="1080" class="video-quality">1080p (Full HD)</option>
-            <option value="1440" class="video-quality">1440p (2K)</option>
-            <option value="2160" class="video-quality">2160p (4K)</option>
-            <option value="best" class="video-quality">Best Available</option>
+          <select id="quality" class="Quality-container">
           </select>
         </div>
       </div>
-      <!--Folder Path-->
+
       <div class="Download-Folder-Container">
-        <button class="Location-path-button">Choose a Location</button>
-        <p class="File-Location">File Location</p>
+        <button id="folderBtn" class="Location-path-button">Choose Location</button>
+        <p id="folder" class="File-Location">No folder selected</p>
       </div>
+
+      <div class="Download-Button-Container">
+        <button id="downloadBtn">Download</button>
+        <button id="cancelBtn">Cancel</button>
+      </div>
+
+      <div class="progress-card" id="progressCard">
+        <div class="progress-header">
+          <h3>Download Progress</h3>
+          <span id="percent" class="progress-percent">0%</span>
+        </div>
+        <div class="progress-bar-container">
+          <div id="bar" class="progress-bar"></div>
+        </div>
+        <div class="progress-info">
+          <div class="info-item">
+            <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="10" stroke-width="2" />
+              <polyline points="12 6 12 12 16 14" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            <span id="eta">Calculating...</span>
+          </div>
+          <div class="info-item">
+            <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+            <span id="speed">--</span>
+          </div>
+        </div>
+        <div class="status-badge" id="statusBadge">
+          <div class="status-dot"></div>
+          <span id="status">Idle</span>
+        </div>
+      </div>
+
     </div>
   </div>
+
+  <script src="./renderer.js"></script>
 </body>
 
 </html>
