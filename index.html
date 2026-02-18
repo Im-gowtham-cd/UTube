@@ -3,173 +3,1131 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <title>Login & Registration Form || VideoSave .net</title>
- <style> 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
-*{
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
-}
-body{
-  min-height: 100vh;
-  width: 100%;
-}
- 
-.container{
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%,-50%);
-  max-width: 430px;
-  width: 100%;
-  background: #fff;
-  border-radius: 7px;
+  <title>UTube — Download YouTube Videos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-}
-.container .registration{
-  display: none;
-}
-#check:checked ~ .registration{
-  display: block;
-}
-#check:checked ~ .login{
-  display: none;
-}
-#check{
-  display: none;
-}
-.container .form{
-  padding: 2rem;
-}
-.form header{
-  font-size: 2rem;
-  font-weight: 500;
-  text-align: center;
-  margin-bottom: 1.5rem;
-}
- .form input{
-   height: 60px;
-   width: 100%;
-   padding: 0 15px;
-   font-size: 17px;
-   margin-bottom: 1.3rem;
-   border: 1px solid #ddd;
-   border-radius: 6px;
-   outline: none;
- }
- .form input:focus{
-   box-shadow: 0 1px 0 rgba(0,0,0,0.2);
- }
-.form a{
-  font-size: 16px;
-  color: rgb(25, 133, 255);
-  text-decoration: none;
-}
-.form a:hover{
-  text-decoration: underline;
-}
-.form input.button{
-  color: #fff;
-  background: rgb(255, 172, 19);
-  font-size: 1.2rem;
-  font-weight: 500;
-  letter-spacing: 1px;
-  margin-top: 1.7rem;
-  cursor: pointer;
-  transition: 0.4s;
-}
-.form input.button:hover{
-  background: rgb(44, 189, 0);
-}
-.signup{
-  font-size: 17px;
-  text-align: center;
-}
-.signup label{
-  color: rgb(25, 133, 255);
-  cursor: pointer;
-}
-.signup label:hover{
-  text-decoration: underline;
-}
-    </style>
+    :root {
+      --red: #c72727;
+      --red-dark: #a01f1f;
+      --red-light: #e03030;
+      --white: #ffffff;
+      --off-white: #f5f0ee;
+      --black: #0a0a0a;
+      --gray: #888;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--white);
+      color: var(--black);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 6vw;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      letter-spacing: 3px;
+      color: var(--red);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 36px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--black);
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+
+    .nav-links a:hover { opacity: 1; }
+
+    .nav-download-btn {
+      background: var(--red);
+      color: var(--white);
+      border: none;
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 12px 24px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      text-decoration: none;
+    }
+
+    .nav-download-btn:hover { background: var(--red-dark); }
+
+    /* ─── HERO ─── */
+    .hero {
+      min-height: 100vh;
+      background: var(--red);
+      display: flex;
+      flex-direction: column;
+      padding: 0 6vw;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Noise texture */
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      opacity: 0.3;
+    }
+
+    /* Big decorative circle */
+    .hero-circle {
+      position: absolute;
+      right: -10vw;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 55vw;
+      height: 55vw;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.12);
+      pointer-events: none;
+    }
+
+    .hero-circle::after {
+      content: '';
+      position: absolute;
+      inset: 12%;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.08);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      flex: 1;
+      padding-top: 120px;
+      padding-bottom: 80px;
+      max-width: 62%;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(255,255,255,0.35);
+      padding: 6px 14px;
+      width: fit-content;
+      margin-bottom: 40px;
+      animation: fadeUp 0.7s ease both;
+    }
+
+    .hero-tag-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--white);
+      animation: pulse 1.4s ease-in-out infinite;
+    }
+
+    .hero-tag span {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--white);
+      opacity: 0.85;
+    }
+
+    .hero-headline {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(64px, 9vw, 140px);
+      line-height: 0.92;
+      letter-spacing: 2px;
+      color: var(--white);
+      animation: fadeUp 0.7s 0.1s ease both;
+    }
+
+    .hero-headline .outline {
+      -webkit-text-stroke: 2px rgba(255,255,255,0.5);
+      color: transparent;
+    }
+
+    .hero-sub {
+      margin-top: 32px;
+      font-size: 17px;
+      line-height: 1.65;
+      color: rgba(255,255,255,0.72);
+      max-width: 460px;
+      animation: fadeUp 0.7s 0.2s ease both;
+    }
+
+    .hero-actions {
+      margin-top: 48px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      animation: fadeUp 0.7s 0.3s ease both;
+    }
+
+    .btn-primary {
+      background: var(--white);
+      color: var(--red);
+      border: none;
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 16px 36px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    }
+
+    .btn-secondary {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255,255,255,0.35);
+      padding-bottom: 2px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .btn-secondary:hover {
+      color: var(--white);
+      border-color: var(--white);
+    }
+
+    /* Stats strip */
+    .hero-stats {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      gap: 0;
+      border-top: 1px solid rgba(255,255,255,0.15);
+      animation: fadeUp 0.7s 0.4s ease both;
+    }
+
+    .stat-item {
+      flex: 1;
+      padding: 28px 0;
+      border-right: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .stat-item:last-child { border-right: none; }
+
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 42px;
+      letter-spacing: 2px;
+      color: var(--white);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      margin-top: 6px;
+    }
+
+    /* ─── FEATURES ─── */
+    .features {
+      padding: 120px 6vw;
+      background: var(--off-white);
+    }
+
+    .section-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(40px, 5vw, 72px);
+      letter-spacing: 2px;
+      line-height: 0.95;
+      color: var(--black);
+      max-width: 560px;
+    }
+
+    .features-grid {
+      margin-top: 70px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+
+    .feature-card {
+      background: var(--white);
+      padding: 44px 36px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--red);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+
+    .feature-card:hover::before { transform: scaleX(1); }
+    .feature-card:hover { transform: translateY(-4px); }
+
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+      margin-bottom: 28px;
+      color: var(--red);
+    }
+
+    .feature-num {
+      position: absolute;
+      top: 28px;
+      right: 28px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 60px;
+      color: rgba(0,0,0,0.04);
+      letter-spacing: 2px;
+      line-height: 1;
+    }
+
+    .feature-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      letter-spacing: 2px;
+      color: var(--black);
+      margin-bottom: 14px;
+    }
+
+    .feature-desc {
+      font-size: 15px;
+      line-height: 1.65;
+      color: #555;
+    }
+
+    /* ─── HOW IT WORKS ─── */
+    .how {
+      padding: 120px 6vw;
+      background: var(--red);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .how::after {
+      content: 'HOW';
+      position: absolute;
+      right: -2vw;
+      bottom: -4vw;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 25vw;
+      color: rgba(255,255,255,0.04);
+      letter-spacing: 4px;
+      pointer-events: none;
+      line-height: 1;
+    }
+
+    .how .section-label { color: rgba(255,255,255,0.55); }
+    .how .section-title { color: var(--white); }
+
+    .steps {
+      margin-top: 70px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+    }
+
+    .step {
+      padding: 44px 32px;
+      border: 1px solid rgba(255,255,255,0.12);
+      position: relative;
+      background: rgba(255,255,255,0.04);
+      transition: background 0.25s;
+    }
+
+    .step:hover { background: rgba(255,255,255,0.08); }
+
+    .step-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 72px;
+      color: rgba(255,255,255,0.15);
+      line-height: 1;
+      margin-bottom: 24px;
+    }
+
+    .step-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 24px;
+      letter-spacing: 2px;
+      color: var(--white);
+      margin-bottom: 12px;
+    }
+
+    .step-desc {
+      font-size: 14px;
+      line-height: 1.65;
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* ─── APP PREVIEW ─── */
+    .preview {
+      padding: 120px 6vw;
+      background: var(--black);
+    }
+
+    .preview .section-label { color: rgba(255,255,255,0.4); }
+    .preview .section-title { color: var(--white); }
+
+    .preview-layout {
+      margin-top: 70px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .preview-mockup {
+      background: var(--red);
+      padding: 40px;
+      position: relative;
+      aspect-ratio: 16/10;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .mockup-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 28px;
+    }
+
+    .mockup-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.25);
+    }
+
+    .mockup-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 36px;
+      letter-spacing: 4px;
+      color: var(--white);
+      line-height: 1;
+    }
+
+    .mockup-input-row {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .mockup-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .mockup-field {
+      height: 32px;
+      background: rgba(255,255,255,0.1);
+      border-bottom: 2px solid rgba(255,255,255,0.5);
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+    }
+
+    .mockup-field-text {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: rgba(255,255,255,0.6);
+    }
+
+    .mockup-progress {
+      margin-top: auto;
+      background: rgba(255,255,255,0.12);
+      height: 4px;
+      border-radius: 0;
+      overflow: hidden;
+    }
+
+    .mockup-bar-fill {
+      height: 100%;
+      width: 65%;
+      background: var(--white);
+      animation: progressAnim 2.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes progressAnim {
+      from { width: 20%; }
+      to { width: 85%; }
+    }
+
+    .mockup-btn-row {
+      margin-top: 14px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .mockup-btn {
+      flex: 1;
+      height: 28px;
+      background: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mockup-btn-text {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--red);
+      font-weight: 700;
+    }
+
+    .preview-text {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .preview-feature {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .preview-feature-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--red);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .preview-feature-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--white);
+    }
+
+    .preview-feature-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      letter-spacing: 2px;
+      color: var(--white);
+      margin-bottom: 6px;
+    }
+
+    .preview-feature-desc {
+      font-size: 14px;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.5);
+    }
+
+    /* ─── PLATFORMS ─── */
+    .platforms {
+      padding: 100px 6vw;
+      background: var(--off-white);
+    }
+
+    .platforms-inner {
+      display: flex;
+      align-items: center;
+      gap: 80px;
+    }
+
+    .platforms-left { flex: 0 0 auto; max-width: 400px; }
+
+    .platform-chips {
+      flex: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .platform-chip {
+      border: 1.5px solid rgba(0,0,0,0.15);
+      padding: 12px 24px;
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--black);
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+      cursor: default;
+    }
+
+    .platform-chip:hover {
+      background: var(--red);
+      color: var(--white);
+      border-color: var(--red);
+    }
+
+    /* ─── DOWNLOAD CTA ─── */
+    .cta {
+      padding: 140px 6vw;
+      background: var(--black);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-bg-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28vw;
+      color: rgba(255,255,255,0.02);
+      letter-spacing: 4px;
+      pointer-events: none;
+      line-height: 1;
+    }
+
+    .cta-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-headline {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(52px, 8vw, 120px);
+      letter-spacing: 3px;
+      color: var(--white);
+      line-height: 0.9;
+      margin-bottom: 40px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-headline span {
+      color: var(--red);
+    }
+
+    .cta-sub {
+      font-size: 16px;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 52px;
+      max-width: 440px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.65;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn-cta-primary {
+      background: var(--red);
+      color: var(--white);
+      border: none;
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 18px 44px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.15s;
+    }
+
+    .btn-cta-primary:hover {
+      background: var(--red-light);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(199,39,39,0.4);
+    }
+
+    .btn-cta-secondary {
+      background: transparent;
+      color: var(--white);
+      border: 1.5px solid rgba(255,255,255,0.2);
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 18px 44px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .btn-cta-secondary:hover {
+      border-color: rgba(255,255,255,0.5);
+      color: var(--white);
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--black);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 40px 6vw;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 3px;
+      color: var(--red);
+    }
+
+    .footer-text {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: rgba(255,255,255,0.25);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .footer-links a {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: rgba(255,255,255,0.8); }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* Scroll reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .features-grid { grid-template-columns: 1fr 1fr; }
+      .steps { grid-template-columns: 1fr 1fr; }
+      .preview-layout { grid-template-columns: 1fr; }
+      .platforms-inner { flex-direction: column; gap: 40px; }
+      .hero-content { max-width: 100%; }
+    }
+
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .features-grid { grid-template-columns: 1fr; }
+      .steps { grid-template-columns: 1fr; }
+      .cta-buttons { flex-direction: column; align-items: center; }
+      footer { flex-direction: column; gap: 20px; text-align: center; }
+    }
+  </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-sm bg-warning navbar-dark fixed-top" >
-        <div class="container-fluid" style="position:sticky;">
-          <a class="navbar-brand" href="file:///F:/VIDEO%20SAVE%20%20.%20NET/YOUTUBE%20VIDEO%20DOWLOAD%20-%20VIDEO%20SAVE%20.NET.html"><b> You <mark style = "background-color:red;color:white; border-radius: 9px;">  tube  </mark> </b>
-      
-      </a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="collapsibleNavbar"style="position:sticky;">
-            <ul class="navbar-nav"style="position:sticky;">
-              <li class="nav-item"style="position:sticky;">
-                  <a class="nav-link" href="#"><b style = "color:white;">Home</a></b>
-                </li>
-              <li class="nav-item"style="position:sticky;">
-                <a class="nav-link" href="file:///F:/VidedoSave%20.net/PREMIUM%20PACK.HTML"><b style = "color:white;">Subscription</a></b>
-              </li>
-              <li class="nav-item"style="position:sticky;">
-                <a class="nav-link" href="#"><b style = "color:white;">Login</b></a>
-              </li>
-              
-              <li class="nav-item dropdown" style="position:sticky;">
-                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"><b style = "color:white;">Video Save</b></a>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="#">Youtube</a></li>
-                  <li><a class="dropdown-item" href="#">Instagram</a></li>
-                  <li><a class="dropdown-item" href="#">Tik Tok</a></li>
-                </ul>
-              </li>
-              </ul>
-              <ul class="navbar-nav">
-              <li class="nav-item" style="float:right;">
-                  <a class="nav-link" href="javascript:alert('You are already in a About Us Page !');"><b style = "color:white;">About Us</a></b>
-                </li>  
-            </ul>
-            
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">UTube</div>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#preview">App</a></li>
+      <li><a href="#download">Download</a></li>
+    </ul>
+    <a href="#download" class="nav-download-btn">↓ Download</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <div class="hero-circle"></div>
+    <div class="hero-content">
+      <div class="hero-tag">
+        <div class="hero-tag-dot"></div>
+        <span>Free &amp; Open Source</span>
+      </div>
+      <h1 class="hero-headline">
+        Download<br>
+        <span class="outline">Any</span><br>
+        Video.
+      </h1>
+      <p class="hero-sub">
+        UTube is a powerful desktop app to download YouTube videos &amp; audio in any format — fast, offline, no limits.
+      </p>
+      <div class="hero-actions">
+        <a href="#download" class="btn-primary">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Get UTube Free
+        </a>
+        <a href="#preview" class="btn-secondary">See the app →</a>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-num">4K</div>
+        <div class="stat-label">Max Resolution</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">MP3 / MP4</div>
+        <div class="stat-label">Output Formats</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">100%</div>
+        <div class="stat-label">Free Forever</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">0</div>
+        <div class="stat-label">Ads or Tracking</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <div class="section-label reveal">— What UTube Does</div>
+    <h2 class="section-title reveal">Built for Speed &amp; Quality.</h2>
+    <div class="features-grid">
+
+      <div class="feature-card reveal">
+        <span class="feature-num">01</span>
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/>
+        </svg>
+        <div class="feature-title">Video &amp; Audio</div>
+        <p class="feature-desc">Download as MP4 in up to 4K resolution, or extract clean MP3 audio from any YouTube video.</p>
+      </div>
+
+      <div class="feature-card reveal reveal-delay-1">
+        <span class="feature-num">02</span>
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+        </svg>
+        <div class="feature-title">Lightning Fast</div>
+        <p class="feature-desc">Multi-threaded download engine ensures the fastest possible speeds for your connection.</p>
+      </div>
+
+      <div class="feature-card reveal reveal-delay-2">
+        <span class="feature-num">03</span>
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+        </svg>
+        <div class="feature-title">Live Progress</div>
+        <p class="feature-desc">Real-time progress bar, download speed, and ETA so you always know what's happening.</p>
+      </div>
+
+      <div class="feature-card reveal">
+        <span class="feature-num">04</span>
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+        </svg>
+        <div class="feature-title">Thumbnail Preview</div>
+        <p class="feature-desc">Instantly fetch and preview the video thumbnail before you download — no surprises.</p>
+      </div>
+
+      <div class="feature-card reveal reveal-delay-1">
+        <span class="feature-num">05</span>
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+        </svg>
+        <div class="feature-title">Custom Location</div>
+        <p class="feature-desc">Choose exactly where files are saved. Pick any folder on your machine with one click.</p>
+      </div>
+
+      <div class="feature-card reveal reveal-delay-2">
+        <span class="feature-num">06</span>
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+        <div class="feature-title">Quality Control</div>
+        <p class="feature-desc">Select exactly the resolution or bitrate you need — from 144p to 4K, 128kbps to 320kbps.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how" id="how">
+    <div class="section-label reveal">— Three Steps</div>
+    <h2 class="section-title reveal">How It Works.</h2>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-num">01</div>
+        <div class="step-title">Paste URL</div>
+        <p class="step-desc">Copy any YouTube video link and paste it into UTube. The thumbnail loads instantly.</p>
+      </div>
+      <div class="step reveal reveal-delay-1">
+        <div class="step-num">02</div>
+        <div class="step-title">Pick Format</div>
+        <p class="step-desc">Choose MP4 or MP3, select your quality, set a filename and pick your save folder.</p>
+      </div>
+      <div class="step reveal reveal-delay-2">
+        <div class="step-num">03</div>
+        <div class="step-title">Download</div>
+        <p class="step-desc">Hit Download. Watch real-time progress with speed and ETA. Done.</p>
+      </div>
+      <div class="step reveal reveal-delay-3">
+        <div class="step-num">04</div>
+        <div class="step-title">Enjoy</div>
+        <p class="step-desc">Your file is saved exactly where you chose it — ready to watch, share, or use offline.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PREVIEW -->
+  <section class="preview" id="preview">
+    <div class="section-label reveal">— App Preview</div>
+    <h2 class="section-title reveal">Clean. Fast.<br>Powerful.</h2>
+    <div class="preview-layout">
+      <div class="preview-mockup reveal">
+        <div class="mockup-bar">
+          <div class="mockup-dot"></div>
+          <div class="mockup-dot"></div>
+          <div class="mockup-dot"></div>
+        </div>
+        <div class="mockup-title">UTUBE</div>
+        <div class="mockup-input-row">
+          <div class="mockup-label">Youtube URL</div>
+          <div class="mockup-field">
+            <span class="mockup-field-text">https://youtube.com/watch?v=dQw4w9WgX...</span>
+          </div>
+          <div class="mockup-label" style="margin-top:14px;">Filename</div>
+          <div class="mockup-field">
+            <span class="mockup-field-text">my_video_hd</span>
           </div>
         </div>
-      </nav><br><br>
-  <div class="container">
-    <input type="checkbox" id="check">
-    <div class="login form">
-      <header><b style = "color:rgb(255, 151, 67)">Login</b></header>
-      <form method = "GET" action="file:///F:/VIDEO%20SAVE%20%20.%20NET/PREMIUM%20REGISTOR%20DISPLAY%20-%20VIDEOSAVE.NET.html">
-        <input type="text" placeholder="Enter your email" name="email">
-        <input type="password" placeholder="Enter your password" name="password">
-        <a href="#"><u>Forgot password?</u></a>
-        <a href="file:///F:/VIDEO%20SAVE%20%20.%20NET/PREMIUM%20REGISTOR%20DISPLAY%20-%20VIDEOSAVE.NET.html"><input type="button" class="button" value="Login"></a>
-      </form>
-      <div class="signup">
-        <span class="signup">Don't have an account?
-         <label for="check"><u>Signup</u></label>
-        </span>
+        <div class="mockup-btn-row">
+          <div class="mockup-btn"><span class="mockup-btn-text">MP4 ▾</span></div>
+          <div class="mockup-btn"><span class="mockup-btn-text">1080p ▾</span></div>
+          <div class="mockup-btn"><span class="mockup-btn-text">Choose Folder</span></div>
+        </div>
+        <div style="margin-top: 18px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-family:'Space Mono',monospace; font-size:10px; color:rgba(255,255,255,0.5); letter-spacing:1px; text-transform:uppercase;">Download Progress</span>
+          <span style="font-family:'Bebas Neue',sans-serif; font-size:22px; color:white; letter-spacing:2px;">65%</span>
+        </div>
+        <div class="mockup-progress">
+          <div class="mockup-bar-fill"></div>
+        </div>
+      </div>
+
+      <div class="preview-text reveal reveal-delay-1">
+        <div class="preview-feature">
+          <div class="preview-feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+          </div>
+          <div>
+            <div class="preview-feature-title">Instant Downloads</div>
+            <p class="preview-feature-desc">Start downloading in seconds. No sign-up, no install wizard, no nonsense — just open and go.</p>
+          </div>
+        </div>
+        <div class="preview-feature">
+          <div class="preview-feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="3"/><polygon points="10,8 16,12 10,16"/>
+            </svg>
+          </div>
+          <div>
+            <div class="preview-feature-title">Thumbnail Fetching</div>
+            <p class="preview-feature-desc">Confirm you have the right video before committing — thumbnails load automatically on URL paste.</p>
+          </div>
+        </div>
+        <div class="preview-feature">
+          <div class="preview-feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+          </div>
+          <div>
+            <div class="preview-feature-title">Live Statistics</div>
+            <p class="preview-feature-desc">Watch the progress bar move in real time. Speed and ETA update every second so you're never left guessing.</p>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="registration form">
-      <header><b style = "color:rgb(255, 151, 67)">Signup</b></header>
-      <form action="#">
-        <input type="text" placeholder="Enter your email" name="email">
-        <input type="password" placeholder="Create a password">
-        <input type="password" placeholder="Confirm your password" name="password">
-        <input type="button" class="button" value="Signup">
-      </form>
-      <div class="signup">
-        <span class="signup">Already have an account?
-         <label for="check"><u>Login</u></label>
-        </span>
+  </section>
+
+  <!-- PLATFORMS -->
+  <section class="platforms" id="platforms">
+    <div class="platforms-inner">
+      <div class="platforms-left">
+        <div class="section-label reveal">— Compatibility</div>
+        <h2 class="section-title reveal" style="color: var(--black); font-size: clamp(36px, 4vw, 56px);">Works on Your Platform.</h2>
+      </div>
+      <div class="platform-chips reveal">
+        <div class="platform-chip">Windows 10</div>
+        <div class="platform-chip">Windows 11</div>
+        <div class="platform-chip">macOS 12+</div>
+        <div class="platform-chip">Ubuntu 20+</div>
+        <div class="platform-chip">Debian</div>
+        <div class="platform-chip">Arch Linux</div>
+        <div class="platform-chip">MP4</div>
+        <div class="platform-chip">MP3</div>
+        <div class="platform-chip">4K UHD</div>
+        <div class="platform-chip">320kbps</div>
       </div>
     </div>
-  </div>
+  </section>
+
+  <!-- DOWNLOAD CTA -->
+  <section class="cta" id="download">
+    <div class="cta-bg-text">DL</div>
+    <div class="cta-label">— Free Download</div>
+    <h2 class="cta-headline">
+      Get UTube.<br>
+      <span>No Cost.</span>
+    </h2>
+    <p class="cta-sub">Download the latest version for your platform. No account needed. No subscription. Just the app.</p>
+    <div class="cta-buttons">
+      <a href="#" class="btn-cta-primary">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Download for Windows
+      </a>
+      <a href="#" class="btn-cta-secondary">Download for macOS</a>
+      <a href="#" class="btn-cta-secondary">Download for Linux</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">UTube</div>
+    <span class="footer-text">© 2025 UTube — Free &amp; Open Source</span>
+    <ul class="footer-links">
+      <li><a href="#">GitHub</a></li>
+      <li><a href="#">Docs</a></li>
+      <li><a href="#">Issues</a></li>
+    </ul>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    reveals.forEach(el => observer.observe(el));
+
+    // Smooth nav highlight
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-links a');
+
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(s => {
+        if (window.scrollY >= s.offsetTop - 120) current = s.id;
+      });
+      navLinks.forEach(a => {
+        a.style.opacity = a.getAttribute('href') === `#${current}` ? '1' : '0.6';
+      });
+    });
+  </script>
 </body>
 </html>
