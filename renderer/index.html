@@ -15,29 +15,32 @@
   <div class="container">
 
     <div class="left">
-      <p class="left-topic">Youtube url</p>
+
+      <p class="left-topic">Youtube URL</p>
+
       <form class="youtube-url-form" onsubmit="return false;">
-        <input id="url" type="url" placeholder="Enter URL" class="youtube-url-input">
+        <input id="url" type="url" placeholder="https://youtube.com/watch?v=..." class="youtube-url-input">
       </form>
+
       <div class="thumbnail-container">
         <h1 class="thumbnail-title">Thumbnail</h1>
         <div class="thumbnail-placeholder" id="thumbPlaceholder">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
             <rect x="2" y="2" width="20" height="20" rx="3" />
             <polygon points="10,8 16,12 10,16" />
           </svg>
         </div>
         <img id="thumb" src="" alt="Thumbnail" class="thumbnail-image">
       </div>
-    </div>
 
+    </div>
 
     <div class="right">
 
       <div class="Filename-Container">
         <h1 class="Filename-title">Filename</h1>
         <form class="Filename-input" onsubmit="return false;">
-          <input id="filename" type="text" placeholder="Enter Filename" class="youtube-filename-input">
+          <input id="filename" type="text" placeholder="Enter filename..." class="youtube-filename-input">
         </form>
       </div>
 
@@ -47,8 +50,7 @@
           <option value="mp3">MP3</option>
         </select>
         <div class="Quality-Div">
-          <select id="quality" class="Quality-container">
-          </select>
+          <select id="quality" class="Quality-container"></select>
         </div>
       </div>
 
@@ -93,6 +95,7 @@
       </div>
 
     </div>
+
   </div>
 
   <script src="./renderer.js"></script>
